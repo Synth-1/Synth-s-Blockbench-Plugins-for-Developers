@@ -2,8 +2,6 @@
 	let extractCubesButton;
 	let extractGroupsButton;
 
-	// Recursively walks a group's descendants (any depth) and returns every
-	// node for which `predicate` returns true.
 	function collectDeep(group, predicate) {
 		let result = [];
 		group.children.forEach(child => {
@@ -21,9 +19,6 @@
 		return Group.all.filter(g => g.selected);
 	}
 
-	// treatAsElements: true for cubes/meshes (safe to pass to Undo/Canvas as
-	// "elements"), false for Group nodes (Undo/Canvas element-specific calls
-	// don't understand Group objects and were silently failing).
 	function runExtract(predicate, actionLabel, emptyMessage, treatAsElements) {
 		let groups = getSelectedTopGroups();
 
@@ -66,7 +61,7 @@
 
 	Plugin.register('extract_group_cubes', {
 		title: 'Extract from Group',
-		author: 'synth',
+		author: 'Synth',
 		description: 'Adds two buttons: one moves all cubes out of the selected group(s), the other moves all subgroups out (even empty ones).',
 		about: 'Select one or more groups in the outliner, then use either action from the Tools menu:\n\n- **Extract Cubes from Group**: moves every cube/mesh found anywhere inside the selected group(s), including nested subgroups, out to sit next to the group.\n- **Extract Groups from Group**: moves every subgroup found anywhere inside the selected group(s) out to sit next to the group, even if that subgroup is empty.\n\n**Note:** if a group has rotation, moved items may need repositioning since their transform is not automatically compensated.',
 		icon: 'output',
