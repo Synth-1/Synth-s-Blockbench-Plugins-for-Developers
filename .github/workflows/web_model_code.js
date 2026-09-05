@@ -1,7 +1,3 @@
-/*
- * Blockbench plugin: Web Model Code
- * Opens the current model's export text in a browser tab without writing a file.
- */
 
 let openModelCodeAction;
 
@@ -41,7 +37,6 @@ Plugin.register('web_model_code', {
 			},
 		});
 
-		// Put the command immediately below File > Save Model (export_over).
 		const fileMenu = MenuBar.menus.file;
 		const saveModelIndex = fileMenu.structure.findIndex(item =>
 			item === 'export_over' || (item && item.id === 'export_over')
