@@ -8,7 +8,7 @@
     icon: 'auto_fix_high',
     author: 'Synth',
     description:
-      'Automatically clears the Namespace field and sets the Folder field based on the texture\'s real file path when a texture is added.',
+      'Automatically clears the Namespace field and sets the Folder field based on the texture\'s real file path when a texture is added. Only works for Optifine Entity models.',
     version: '1.0.0',
     variant: 'both',
 
@@ -31,6 +31,8 @@
 
   function fixTexturePath(texture) {
     if (!texture || !texture.path) return;
+
+    if (!Blockbench.format || Blockbench.format.id !== 'optifine_entity') return;
 
     let path = texture.path.replace(/\\/g, '/');
     let parts = path.split('/');
