@@ -8,7 +8,7 @@
     icon: 'auto_fix_high',
     author: 'Synth',
     description:
-      'Automatically clears the Namespace field and sets the Folder field based on the texture\'s real file path when a texture is added. Only works for Optifine Entity models.',
+      "Automatically clears the Namespace field, sets the Folder field based on the texture's real file path, reloads the texture, and assigns it to the first material with no texture. Only works for Optifine Entity models.",
     version: '1.0.0',
     variant: 'both',
 
@@ -46,5 +46,23 @@
 
     texture.namespace = '';
     texture.folder = newFolder;
+
+    if (texture.reload) texture.reload();
+
+    applyTextureToModel(texture);
+  }
+
+  function applyTextureToModel(texture) {
+    let model = Blockbench.model;
+    if (!model || !model.materials || model.materials.length === 0) return;
+
+    let material = model.materials.find(m => !m.texture);
+    if (!material) return;
+
+    if (material.setTexture) {
+      material.setTexture(texture);
+    } else {
+      material.texture = texture;
+    }
   }
 })();
