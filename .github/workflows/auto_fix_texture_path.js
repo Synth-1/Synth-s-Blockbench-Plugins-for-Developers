@@ -1,26 +1,36 @@
 (function () {
   let addTextureListener;
-
   const MARKER_FOLDER_NAME = 'emf';
+
+  function isOptifineEntity() {
+    return typeof Format !== 'undefined' && Format && Format.id && Format.id.includes('optifine');
+  }
 
   Plugin.register('auto_fix_texture_path', {
     title: 'Auto Fix Texture Path',
     icon: 'auto_fix_high',
     author: 'Synth',
-    description:
-      "Automatically clears the Namespace field, sets the Folder field based on the texture's real file path, reloads the texture, and assigns it to the first material with no texture. Only works for Optifine Entity models.",
-    version: '1.0.0',
+    description: 'Automatically clears Namespace, sets Folder from real file path and loads the texture into the model. OptiFine Entity format only.',
+    version: '1.2.0',
     variant: 'both',
 
     onload() {
       addTextureListener = (data) => {
+        if (!isOptifineEntity()) return;
         let texture = data && data.texture ? data.texture : data;
-        if (texture) fixTexturePath(texture);
+        if (texture) {
+          if (fixTexturePath(texture)) {
+            loadTextureToModel(texture);
+          }
+        }
       };
       Blockbench.on('add_texture', addTextureListener);
 
-      if (typeof Texture !== 'undefined' && Texture.all) {
-        Texture.all.forEach(fixTexturePath);
+      if (isOptifineEntity() && typeof Texture !== 'undefined' && Texture.all) {
+        Texture.all.forEach((t) => fixTexturePath(t));
+        if (Texture.all.length > 0) {
+          loadTextureToModel(Texture.all[Texture.all.length - 1]);
+        }
       }
     },
 
@@ -30,39 +40,45 @@
   });
 
   function fixTexturePath(texture) {
-    if (!texture || !texture.path) return;
-
-    if (!Blockbench.format || Blockbench.format.id !== 'optifine_entity') return;
+    if (!isOptifineEntity()) return false;
+    if (!texture || !texture.path) return false;
 
     let path = texture.path.replace(/\\/g, '/');
     let parts = path.split('/');
     parts.pop();
 
     let markerIndex = parts.lastIndexOf(MARKER_FOLDER_NAME);
-    if (markerIndex === -1) return;
+    if (markerIndex === -1) return false;
 
     let folderParts = parts.slice(markerIndex);
     let newFolder = folderParts.join('/') + '/';
 
     texture.namespace = '';
     texture.folder = newFolder;
-
-    if (texture.reload) texture.reload();
-
-    applyTextureToModel(texture);
+    return true;
   }
 
-  function applyTextureToModel(texture) {
-    let model = Blockbench.model;
-    if (!model || !model.materials || model.materials.length === 0) return;
+  function loadTextureToModel(texture) {
+    if (!texture) return;
+    try {
+      if (texture.select) texture.select();
 
-    let material = model.materials.find(m => !m.texture);
-    if (!material) return;
+      if (typeof Cube !== 'undefined' && Cube.all) {
+        Cube.all.forEach((cube) => {
+          if (!cube.faces) return;
+          for (let f in cube.faces) {
+            if (cube.faces[f]) {
+              cube.faces[f].texture = texture.uuid;
+            }
+          }
+        });
+      }
 
-    if (material.setTexture) {
-      material.setTexture(texture);
-    } else {
-      material.texture = texture;
+      if (typeof Canvas !== 'undefined' && Canvas.updateView) {
+        Canvas.updateView({ textures: true, elements: true });
+      }
+    } catch (e) {
+      console.error('[AutoFixTexturePath] load failed', e);
     }
   }
 })();
