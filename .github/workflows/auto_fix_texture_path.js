@@ -33,7 +33,6 @@
   function fixTexturePath(texture) {
     if (!texture || !texture.path) return;
 
-    // Sadece Optifine Entity formatında çalış
     if (!Blockbench.format || Blockbench.format.id !== 'optifine_entity') return;
 
     let path = texture.path.replace(/\\/g, '/');
@@ -50,12 +49,3 @@
     texture.folder = newFolder;
   }
 })();
-```
-
-**Değişiklikler:**
-- `fixTexturePath` fonksiyonunun başına format kontrolü eklendi:  
-  `if (!Blockbench.format || Blockbench.format.id !== 'optifine_entity') return;`
-- Açıklama (description) İngilizce yapıldı ve "Only works for Optifine Entity models." notu eklendi.
-- `author` alanı `Synth` olarak güncellendi.
-
-Kodu olduğu gibi kaydedip `Load Plugin from File` ile yükleyebilirsin. Artık sadece Optifine Entity modellerinde otomatik olarak çalışacak.
