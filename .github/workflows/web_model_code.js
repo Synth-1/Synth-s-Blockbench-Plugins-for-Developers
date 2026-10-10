@@ -5,7 +5,7 @@ Plugin.register('web_model_code', {
     author: 'Synth',
     description: 'Shows the current model output as text in a Blockbench window, without saving a file.',
     icon: 'code',
-    version: '1.1.0',
+    version: '1.0.0',
     variant: 'both',
     min_version: '4.0.0',
     onload() {
