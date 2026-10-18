@@ -65,7 +65,9 @@ function fixRotations() {
   rotated.forEach(cube => {
     const rotation = cube.rotation.slice();
     const origin = Array.isArray(cube.origin) ? cube.origin.slice() : [0,0,0];
-    const parent = Group.all.find(candidate => candidate.uuid === cube.parent) || null;
+    const parent = cube.parent instanceof Group
+      ? cube.parent
+      : Group.all.find(candidate => candidate.uuid === cube.parent) || null;
     const group = new Group({name:`${cube.name || 'cube'}_rotation`, origin, rotation}).init();
     if (parent) {
       // Keep the rotation group inside the cube's original parent group.
