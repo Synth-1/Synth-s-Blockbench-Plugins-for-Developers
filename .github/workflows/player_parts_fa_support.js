@@ -65,8 +65,14 @@ function fixRotations() {
   rotated.forEach(cube => {
     const rotation = cube.rotation.slice();
     const origin = Array.isArray(cube.origin) ? cube.origin.slice() : [0,0,0];
-    const parent = Group.all.find(candidate => candidate.uuid === cube.parent) || 'root';
-    const group = new Group({name:`${cube.name || 'cube'}_rotation`, origin, rotation}).init().addTo(parent);
+    const parent = Group.all.find(candidate => candidate.uuid === cube.parent) || null;
+    const group = new Group({name:`${cube.name || 'cube'}_rotation`, origin, rotation}).init();
+    if (parent) {
+      // Keep the rotation group inside the cube's original parent group.
+      group.addTo(parent);
+    } else {
+      group.addTo('root');
+    }
     cube.addTo(group);
     cube.rotation = [0,0,0];
   });
@@ -134,7 +140,6 @@ Plugin.register('player_parts_fa_support', {
     this.rotationAction?.delete();
   }
 });
-
 
 
 
